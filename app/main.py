@@ -53,6 +53,40 @@ def hash_object(file_path, write=False):
 
     print(sha1)
 
+def ls_tree(tree_sha):
+    object_dir = f".git/objects/{tree_sha[:2]}"
+    object_file = f"{object_dir}/{tree_sha[2:]}"
+
+    with open(object_file, "rb") as f:
+        compressed_data = f.read()
+
+    decompressed_data = zlib.decompress(compressed_data)
+    header_end = decompressed_data.find(b'\0')
+    content = decompressed_data[header_end + 1:]
+
+    entries = []
+    offset = 0
+    while offset < len(content):
+        null_pos = content.find(b'\0', offset)
+        
+        mode_name = content[offset:null_pos].decode()
+        mode, name = mode_name.split(" ", 1)
+
+        sha_start = null_pos + 1
+        sha_end = sha_start + 20
+        sha = content[sha_start:sha_end]
+
+        entries.append({
+            "mode": mode,
+            "name": name,
+            "sha": sha.hex()
+        })
+
+        offset = sha_end
+
+    return entries
+
+
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!", file=sys.stderr)
@@ -68,6 +102,13 @@ def main():
     elif command == "hash-object" and sys.argv[2] == "-w":
         file_path = sys.argv[3]
         hash_object(file_path, write=True)
+    elif command == "ls-tree" and sys.argv[2] == "--name-only":
+        tree_sha = sys.argv[3]
+        entries = ls_tree(tree_sha)
+
+        for entry in entries:
+            print(entry["name"])
+
     else:
         raise RuntimeError(f"Unknown command #{command}")
 
