@@ -26,7 +26,7 @@ def cat_file(blob_sha):
     if header_end == -1:
         sys.exit(1)
 
-    content = decompressed_data[header_end + 1:]
+    content = decompressed_data[header_end + 1:-2]
     print(content.decode())
 
 
