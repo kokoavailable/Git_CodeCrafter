@@ -116,8 +116,10 @@ def ls_tree(tree_sha):
         })
 
         offset = sha_end
+    print(entries)
 
     return entries
+
 
 
 def main():
