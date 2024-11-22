@@ -30,6 +30,36 @@ def cat_file(blob_sha):
     content = decompressed_data[header_end + 1:]
     print(content.decode(), end= "")
 
+def write_tree(directory="."):
+    s = b""
+    for entry in sorted(os.listdir(directory)):
+        if entry == ".git":
+            continue
+
+        entry_path = os.path.join(directory, entry)
+        if os.path.isdir(entry_path):
+            tree_sha = write_tree(entry_path)
+            mode = "40000"
+        elif os.path.isfile(entry_path):
+            mode = "100644"
+        else:
+            continue
+        sha1 = write_tree(entry_path) if os.path.isdir(entry_path) else hash_object(entry_path)
+        s += f"{mode} {entry}\0".encode() + bytes.fromhex(sha1)
+
+    tree_content = f"tree {len(s)}\0".encode() + s
+    sha1 = hashlib.sha1(tree_content).hexdigest()
+    obj_dir = f".git/objects/{sha1[:2]}"
+    obj_file = f"{obj_dir}/{sha1[2:]}"
+    os.makedirs(obj_dir, exist_ok=True)
+    with open(obj_file, "wb") as f:
+        f.write(zlib.compress(tree_content))
+    print(sha1)
+    return sha1
+
+
+
+
 def hash_object(file_path, write=False):
     with open(file_path, "rb") as f:
         content = f.read()
@@ -52,6 +82,7 @@ def hash_object(file_path, write=False):
             f.write(compressed_blob)
 
     print(sha1)
+    return sha1
 
 def ls_tree(tree_sha):
     object_dir = f".git/objects/{tree_sha[:2]}"
@@ -105,9 +136,15 @@ def main():
     elif command == "ls-tree" and sys.argv[2] == "--name-only":
         tree_sha = sys.argv[3]
         entries = ls_tree(tree_sha)
+    elif command == "write-tree":
+        tree_sha = write_tree(".")
 
-        for entry in entries:
-            print(entry["name"])
+
+
+        
+
+
+
 
     else:
         raise RuntimeError(f"Unknown command #{command}")
