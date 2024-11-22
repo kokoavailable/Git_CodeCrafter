@@ -37,17 +37,21 @@ def write_tree(directory="."):
             continue
 
         entry_path = os.path.join(directory, entry)
+
         if os.path.isdir(entry_path):
             mode = "40000"
+            sha1 = write_tree(entry_path)
         elif os.path.isfile(entry_path):
             mode = "100644"
+            sha1 = hash_object(entry_path, write= True)
         else:
             continue
-        sha1 = write_tree(entry_path) if os.path.isdir(entry_path) else hash_object(entry_path)
+        
         s += f"{mode} {entry}\0".encode() + bytes.fromhex(sha1)
 
     tree_content = f"tree {len(s)}\0".encode() + s
     sha1 = hashlib.sha1(tree_content).hexdigest()
+    
     obj_dir = f".git/objects/{sha1[:2]}"
     obj_file = f"{obj_dir}/{sha1[2:]}"
     os.makedirs(obj_dir, exist_ok=True)
