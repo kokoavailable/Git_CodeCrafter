@@ -31,7 +31,6 @@ def cat_file(blob_sha):
     print(content.decode(), end= "")
 
 def write_tree(directory="."):
-    s = b""
     for entry in sorted(os.listdir(directory)):
         if entry == ".git":
             continue
