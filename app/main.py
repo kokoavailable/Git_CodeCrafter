@@ -2,6 +2,7 @@ import sys
 import os
 import zlib
 import hashlib
+import time
 
 def init_git():
     os.mkdir(".git")
@@ -117,6 +118,24 @@ def ls_tree(tree_sha):
 
     return entries
 
+def commit_tree(tree_sha, parent_sha = None, author = "", committer = "", message = ""):
+    timestamp = int(time.time())
+    timezone = '+0000'
+
+    content = f"tree {tree_sha}\n"
+    if parent_sha:
+        content += f"parent {parent_sha}\n"
+        content += f"author {author} {timestamp} {timezone}\n"
+        content += f"committer {committer} {timestamp} {timezone}\n\n"
+        content += message + "\n"
+
+    size = len(content)
+    commit_object = f"commit {size}\0".encode() + content.encode()
+
+    sha1 = hashlib.sha1(commit_object).hexdigest()
+
+    # save_to_git_objects(sha1, commit_object)
+    return sha1
 
 
 def main():
@@ -137,10 +156,23 @@ def main():
         print(blob_sha, end="")
     elif command == "ls-tree" and sys.argv[2] == "--name-only":
         tree_sha = sys.argv[3]
-        entries = ls_tree(tree_sha)
+        ls_tree(tree_sha)
     elif command == "write-tree":
         tree_sha = write_tree(".")
         print(tree_sha)
+    elif command == "commit-tree":
+        tree_sha = sys.argv[2]
+
+        if len(sys.argv) == 5 and sys.argv[3] == "-m":
+            message = sys.argv[4]
+
+        elif len(sys.argv) == 7 and sys.argv[3] == "-p" and sys.argv[5] == "-m":
+            parent_sha = sys.argv[4]
+            message = sys.argv[6]
+        else:
+            sys.exit(1)
+
+        print(commit_tree(tree_sha, parent_sha, message), end = "")
 
 
 
