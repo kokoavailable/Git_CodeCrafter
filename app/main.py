@@ -51,7 +51,7 @@ def write_tree(directory="."):
 
     tree_content = f"tree {len(s)}\0".encode() + s
     sha1 = hashlib.sha1(tree_content).hexdigest()
-    
+
     obj_dir = f".git/objects/{sha1[:2]}"
     obj_file = f"{obj_dir}/{sha1[2:]}"
     os.makedirs(obj_dir, exist_ok=True)
@@ -84,7 +84,6 @@ def hash_object(file_path, write=False):
         with open(object_file, "wb") as f:
             f.write(compressed_blob)
 
-    print(sha1)
     return sha1
 
 def ls_tree(tree_sha):
