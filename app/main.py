@@ -118,7 +118,7 @@ def ls_tree(tree_sha):
 
     return entries
 
-def commit_tree(tree_sha, parent_sha = None, author = "", committer = "", message = ""):
+def commit_tree(tree_sha, message, parent_sha = None, author = "", committer = ""):
     timestamp = int(time.time())
     timezone = '+0000'
 
@@ -178,7 +178,7 @@ def main():
         else:
             sys.exit(1)
 
-        print(commit_tree(tree_sha, parent_sha, message), end = "")
+        print(commit_tree(tree_sha, message, parent_sha), end = "")
 
 
 
