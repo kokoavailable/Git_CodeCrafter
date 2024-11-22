@@ -38,7 +38,6 @@ def write_tree(directory="."):
 
         entry_path = os.path.join(directory, entry)
         if os.path.isdir(entry_path):
-            tree_sha = write_tree(entry_path)
             mode = "40000"
         elif os.path.isfile(entry_path):
             mode = "100644"
