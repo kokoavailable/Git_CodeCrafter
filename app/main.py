@@ -133,7 +133,8 @@ def main():
         cat_file(blob_sha)
     elif command == "hash-object" and sys.argv[2] == "-w":
         file_path = sys.argv[3]
-        hash_object(file_path, write=True)
+        blob_sha = hash_object(file_path, write=True)
+        print(blob_sha, end="")
     elif command == "ls-tree" and sys.argv[2] == "--name-only":
         tree_sha = sys.argv[3]
         entries = ls_tree(tree_sha)
