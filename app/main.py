@@ -97,7 +97,7 @@ def ls_tree(tree_sha):
     header_end = decompressed_data.find(b'\0')
     content = decompressed_data[header_end + 1:]
 
-    entries = []
+    entries = ""
     offset = 0
     while offset < len(content):
         null_pos = content.find(b'\0', offset)
@@ -109,13 +109,10 @@ def ls_tree(tree_sha):
         sha_end = sha_start + 20
         sha = content[sha_start:sha_end]
 
-        entries.append({
-            "mode": mode,
-            "name": name,
-            "sha": sha.hex()
-        })
+        entries += f"{name}\n"
 
         offset = sha_end
+
     print(entries)
 
     return entries
