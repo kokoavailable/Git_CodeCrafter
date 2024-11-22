@@ -134,6 +134,12 @@ def commit_tree(tree_sha, parent_sha = None, author = "", committer = "", messag
 
     sha1 = hashlib.sha1(commit_object).hexdigest()
 
+    obj_dir = f".git/objects/{sha1[:2]}"
+    obj_file = f"{obj_dir}/{sha1[2:]}"
+    os.makedirs(obj_dir, exist_ok=True)
+    with open(obj_file, "wb") as f:
+        f.write(zlib.compress(commit_object))
+
     # save_to_git_objects(sha1, commit_object)
     return sha1
 
