@@ -31,6 +31,7 @@ def cat_file(blob_sha):
     print(content.decode(), end= "")
 
 def write_tree(directory="."):
+    s = b""
     for entry in sorted(os.listdir(directory)):
         if entry == ".git":
             continue
@@ -53,7 +54,7 @@ def write_tree(directory="."):
     os.makedirs(obj_dir, exist_ok=True)
     with open(obj_file, "wb") as f:
         f.write(zlib.compress(tree_content))
-    print(sha1)
+    
     return sha1
 
 
@@ -137,6 +138,7 @@ def main():
         entries = ls_tree(tree_sha)
     elif command == "write-tree":
         tree_sha = write_tree(".")
+        print(tree_sha)
 
 
 
