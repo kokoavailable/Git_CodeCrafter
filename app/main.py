@@ -138,7 +138,6 @@ def main():
     elif command == "ls-tree" and sys.argv[2] == "--name-only":
         tree_sha = sys.argv[3]
         entries = ls_tree(tree_sha)
-        print(entries["name"])
     elif command == "write-tree":
         tree_sha = write_tree(".")
         print(tree_sha)
