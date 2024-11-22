@@ -113,7 +113,7 @@ def ls_tree(tree_sha):
 
         offset = sha_end
 
-    print(entries)
+    print(entries, end="")
 
     return entries
 
